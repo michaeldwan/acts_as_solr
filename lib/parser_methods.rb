@@ -37,7 +37,10 @@ module ActsAsSolr #:nodoc:
         end
         
         query_options[:field_list] = [field_list, 'score']
-        query = "(#{query.gsub(/ *: */,"_t:")}) #{models}"
+        # This command changes pk:123 to pk_t:123 rather than pk_i:123
+        # query = "(#{query.gsub(/ *: */,"_t:")}) #{models}"
+        # Yes, a second gsub is a hack but it will work... for now.
+        query = "(#{query.gsub(/ *: */,"_t:").gsub('pk_t:', 'pk_i:')}) #{models}"
         order = options[:order].split(/\s*,\s*/).collect{|e| e.gsub(/\s+/,'_t ').gsub(/\bscore_t\b/, 'score')  }.join(',') if options[:order] 
         query_options[:query] = replace_types([query])[0] # TODO adjust replace_types to work with String or Array  
 
